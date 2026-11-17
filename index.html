@@ -88,15 +88,6 @@
       margin-top: 10px;
       width: 100%;
     }
-    .meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 14px;
-    }
-    @media (max-width: 420px) {
-      .meta-grid { grid-template-columns: 1fr; }
-    }
     label {
       display: block;
       font-size: 13px;
@@ -104,7 +95,7 @@
       color: var(--muted);
       margin-bottom: 6px;
     }
-    input[type="text"], input[type="date"], textarea {
+    input[type="text"] {
       width: 100%;
       min-height: 48px;
       padding: 12px 14px;
@@ -116,12 +107,11 @@
       font-family: inherit;
       appearance: none;
     }
-    input:focus, textarea:focus {
+    input:focus {
       outline: 2px solid var(--orange);
       outline-offset: 1px;
       background: #fff;
     }
-    textarea { min-height: 80px; resize: vertical; }
     details.area { background: var(--card); }
     details.area > summary {
       list-style: none;
@@ -365,20 +355,6 @@
       <button type="button" class="btn-secondary sheet-btn" id="openSheet">Open sheet — tap to zoom</button>
     </div>
 
-    <h2>Who measured</h2>
-    <div class="card">
-      <div class="meta-grid">
-        <div>
-          <label for="measuredBy">Measured by</label>
-          <input id="measuredBy" type="text" autocomplete="name" placeholder="Your name">
-        </div>
-        <div>
-          <label for="measuredDate">Date</label>
-          <input id="measuredDate" type="date">
-        </div>
-      </div>
-    </div>
-
     <h2>Joists</h2>
     <div id="areas"></div>
     <button type="button" class="add-btn" id="addArea">+ Add joist / area</button>
@@ -407,7 +383,8 @@
   <script src="jspdf.umd.min.js"></script>
   <script>
   (function () {
-    const STORAGE_KEY = "gr-joist-fm01-v1";
+    const STORAGE_KEY = "gr-joist-fm01-v2";
+    const LEGACY_STORAGE_KEYS = ["gr-joist-fm01-v1"];
     const PHOTO_MAX = 6;
     const PHOTO_EDGE = 1400;
     const PHOTO_QUALITY = 0.68;
@@ -421,28 +398,22 @@
       { id: "d05-4", name: "D05 area 4" }
     ];
 
-    const emptyArea = (partial) => Object.assign({
-      id: "",
-      name: "",
-      custom: false,
-      grid: "",
-      a1: "", a2: "",
-      b: "", c: "", d: "", e: "", f: "", g: "", h: "",
-      notes: "",
-      photos: []
-    }, partial);
-
-    const state = {
-      measuredBy: "",
-      date: todayISO(),
-      areas: DEFAULT_AREAS.map((a) => emptyArea({ ...a, custom: false }))
+    const emptyArea = (partial) => {
+      const src = partial || {};
+      return {
+        id: src.id || "",
+        name: src.name || "",
+        custom: !!src.custom,
+        a1: src.a1 || "", a2: src.a2 || "",
+        b: src.b || "", c: src.c || "", d: src.d || "", e: src.e || "",
+        f: src.f || "", g: src.g || "", h: src.h || "",
+        photos: Array.isArray(src.photos) ? src.photos : []
+      };
     };
 
-    function todayISO() {
-      const d = new Date();
-      const tz = d.getTimezoneOffset() * 60000;
-      return new Date(d.getTime() - tz).toISOString().slice(0, 10);
-    }
+    const state = {
+      areas: DEFAULT_AREAS.map((a) => emptyArea({ ...a, custom: false }))
+    };
 
     function uid() {
       return "x-" + Math.random().toString(36).slice(2, 9);
@@ -458,13 +429,23 @@
 
     function load() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const data = JSON.parse(raw);
-        if (data.measuredBy != null) state.measuredBy = data.measuredBy;
-        if (data.date) state.date = data.date;
-        if (Array.isArray(data.areas) && data.areas.length) {
-          state.areas = data.areas.map((a) => emptyArea(a));
+        let raw = localStorage.getItem(STORAGE_KEY);
+        let fromLegacy = false;
+        if (!raw) {
+          for (const key of LEGACY_STORAGE_KEYS) {
+            raw = localStorage.getItem(key);
+            if (raw) { fromLegacy = true; break; }
+          }
+        }
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (Array.isArray(data.areas) && data.areas.length) {
+            state.areas = data.areas.map((a) => emptyArea(a));
+          }
+        }
+        if (fromLegacy) {
+          LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+          save();
         }
       } catch (err) {
         console.warn("Could not load saved data", err);
@@ -483,8 +464,6 @@
         // Likely quota from photos — retry without photos in storage, keep them in memory
         try {
           const slim = {
-            measuredBy: state.measuredBy,
-            date: state.date,
             areas: state.areas.map((a) => Object.assign({}, a, { photos: [] })),
             photosDropped: true
           };
@@ -500,7 +479,7 @@
     }
 
     function filledCount(area) {
-      const keys = ["grid", "a1", "a2", "b", "c", "d", "e", "f", "g", "h"];
+      const keys = ["a1", "a2", "b", "c", "d", "e", "f", "g", "h"];
       return keys.filter((k) => String(area[k] || "").trim()).length;
     }
 
@@ -520,8 +499,6 @@
     }
 
     function render() {
-      document.getElementById("measuredBy").value = state.measuredBy;
-      document.getElementById("measuredDate").value = state.date;
       const root = document.getElementById("areas");
       root.innerHTML = "";
       state.areas.forEach((area, idx) => {
@@ -551,17 +528,11 @@
       return `
         <summary>
           <span>${escapeHtml(area.name || "Joist")}</span>
-          <span class="badge ${filled ? "done" : ""}">${filled}/10</span>
+          <span class="badge ${filled ? "done" : ""}">${filled}/9</span>
           <span class="chev"></span>
         </summary>
         <div class="area-body">
           ${customName}
-          <div class="field-row full">
-            <div class="field">
-              <label>Grid location</label>
-              <input type="text" data-k="grid" value="${escapeHtml(area.grid)}" placeholder="e.g. D–E / 8–9" autocomplete="off">
-            </div>
-          </div>
           <div class="field-row full">
             <div class="field">
               <label><span class="letter">A</span> Bottom chord angle size (leg × leg)</label>
@@ -588,12 +559,6 @@
           </div>
           <div class="field-row full">
             ${numField("h", "H", "Panel point spacing", area.h)}
-          </div>
-          <div class="field-row full">
-            <div class="field">
-              <label>Notes</label>
-              <textarea data-k="notes" placeholder="Anything unusual, a size change along the span, etc.">${escapeHtml(area.notes)}</textarea>
-            </div>
           </div>
           <div class="photos">
             <label>Photos</label>
@@ -738,30 +703,21 @@
       doc.setFontSize(10);
       doc.text("D01 / D11 / D05    ·    Project 5291    ·    Sheet FM-01    ·    For field verification only", m, 0.80);
 
-      const by = state.measuredBy || "—";
-      const dt = state.date || "—";
-      doc.setFontSize(10);
-      doc.text("Measured by: " + by + "      Date: " + dt, m, 1.02);
-      doc.setTextColor(90, 90, 90);
-      doc.text("Generated: " + new Date().toLocaleString(), W - m, 1.02, { align: "right" });
-      doc.setTextColor(20, 20, 20);
-
       const cols = [
-        { k: "name", h: "Area", w: 1.30 },
-        { k: "grid", h: "Grid location", w: 1.45 },
-        { k: "A", h: "A  angle", w: 1.15 },
-        { k: "b", h: "B  thk", w: 0.70 },
-        { k: "c", h: "C  gap", w: 0.70 },
-        { k: "d", h: "D  diag.", w: 0.85 },
-        { k: "e", h: "E  vert.", w: 0.85 },
-        { k: "f", h: "F  weld d.", w: 0.78 },
-        { k: "g", h: "G  weld v.", w: 0.78 },
-        { k: "h", h: "H  spacing", w: 0.80 },
-        { k: "photos", h: "Photos", w: 0.64 }
+        { k: "name", h: "Area", w: 1.70 },
+        { k: "A", h: "A  angle", w: 1.35 },
+        { k: "b", h: "B  thk", w: 0.85 },
+        { k: "c", h: "C  gap", w: 0.85 },
+        { k: "d", h: "D  diag.", w: 0.95 },
+        { k: "e", h: "E  vert.", w: 0.95 },
+        { k: "f", h: "F  weld d.", w: 0.90 },
+        { k: "g", h: "G  weld v.", w: 0.90 },
+        { k: "h", h: "H  spacing", w: 0.95 },
+        { k: "photos", h: "Photos", w: 0.60 }
       ];
       const tableW = cols.reduce((s, c) => s + c.w, 0);
       let x0 = m;
-      let y = 1.20;
+      let y = 1.00;
       const rowH = 0.32;
       const hdrH = 0.36;
 
@@ -808,43 +764,6 @@
       doc.setDrawColor(40, 40, 40);
       doc.setLineWidth(0.01);
       // outline of last table segment is approximate; acceptable
-
-      y += 0.18;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.text("Notes", m, y);
-      y += 0.18;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      const notes = state.areas.filter((a) => (a.notes || "").trim());
-      if (!notes.length) {
-        doc.setTextColor(90, 90, 90);
-        doc.text("No notes entered.", m, y);
-        doc.setTextColor(20, 20, 20);
-        y += 0.24;
-      } else {
-        notes.forEach((a) => {
-          const block = a.name + ": " + a.notes.trim();
-          const lines = doc.splitTextToSize(block, W - 2 * m);
-          if (y + lines.length * 0.18 > H - 0.45) {
-            doc.addPage();
-            y = m;
-          }
-          doc.setFont("helvetica", "bold");
-          doc.text(a.name + ": ", m, y);
-          doc.setFont("helvetica", "normal");
-          const prefixW = doc.getTextWidth(a.name + ": ");
-          const rest = doc.splitTextToSize(a.notes.trim(), W - 2 * m - prefixW);
-          doc.text(rest[0] || "", m + prefixW, y);
-          y += 0.18;
-          rest.slice(1).forEach((ln) => {
-            if (y > H - 0.45) { doc.addPage(); y = m; }
-            doc.text(ln, m, y);
-            y += 0.18;
-          });
-          y += 0.06;
-        });
-      }
 
       // Photos
       const withPhotos = state.areas.filter((a) => (a.photos || []).length);
@@ -896,8 +815,7 @@
     }
 
     function pdfFilename() {
-      const d = (state.date || todayISO()).replace(/-/g, "");
-      return "GR_5291_Joist_Field_Measurements_" + d + ".pdf";
+      return "GR_5291_Joist_Field_Measurements.pdf";
     }
 
     async function makePdf(share) {
@@ -1051,14 +969,6 @@
     })();
 
     /* ---------- events ---------- */
-    document.getElementById("measuredBy").addEventListener("input", (e) => {
-      state.measuredBy = e.target.value;
-      scheduleSave();
-    });
-    document.getElementById("measuredDate").addEventListener("input", (e) => {
-      state.date = e.target.value;
-      scheduleSave();
-    });
     document.getElementById("addArea").addEventListener("click", () => {
       const n = state.areas.filter((a) => a.custom).length + 1;
       const area = emptyArea({
@@ -1076,8 +986,7 @@
     document.getElementById("clearAll").addEventListener("click", () => {
       if (!confirm("Clear all measurements and photos saved on this phone?")) return;
       localStorage.removeItem(STORAGE_KEY);
-      state.measuredBy = "";
-      state.date = todayISO();
+      LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
       state.areas = DEFAULT_AREAS.map((a) => emptyArea({ ...a, custom: false }));
       render();
       document.getElementById("saveStatus").textContent = "Saved data cleared.";

@@ -8,4 +8,4 @@ Progress is saved in the browser on that phone (localStorage). Nothing is upload
 
 This repository contains only the form and the FM-01 field sheet image. It does not include other project documents or personal data.
 
-Live site: https://dsalinger-ctrl.github.io/gr-joist-field-measure/
+Live site: https://gr-joist-field-measure.vercel.app/
