@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="GR Joist Measures">
+  <title>Gila River Lone Butte – Existing Roof Joist Field Measurements</title>
+  <style>
+    :root {
+      --ink: #1c1c1c;
+      --muted: #5a5a5a;
+      --bg: #f3f1ec;
+      --card: #ffffff;
+      --line: #dcd8d0;
+      --orange: #e8941a;
+      --orange-dk: #c47a0d;
+      --fill: #f7f5f1;
+      --ok: #2d6a4f;
+      --danger: #9b2c2c;
+      --shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 16px rgba(0,0,0,.06);
+      --radius: 14px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --safe-t: env(safe-area-inset-top, 0px);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.4;
+      padding-bottom: calc(96px + var(--safe-b));
+    }
+    header.app-head {
+      background: #1c1c1c;
+      color: #fff;
+      padding: calc(14px + var(--safe-t)) 18px 16px;
+    }
+    header.app-head .brand {
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 700;
+    }
+    header.app-head h1 {
+      font-size: 1.15rem;
+      line-height: 1.3;
+      margin: 6px 0 4px;
+      font-weight: 700;
+    }
+    header.app-head p {
+      margin: 0;
+      color: #cfcfcf;
+      font-size: 13px;
+    }
+    main { padding: 16px; max-width: 720px; margin: 0 auto; }
+    h2 {
+      font-size: 13px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 22px 0 10px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .sheet-card { padding: 12px; }
+    .sheet-card p { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+    .sheet-thumb {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      cursor: zoom-in;
+    }
+    .sheet-btn {
+      margin-top: 10px;
+      width: 100%;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 14px;
+    }
+    @media (max-width: 420px) {
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="date"], textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--fill);
+      color: var(--ink);
+      font-size: 16px;
+      font-family: inherit;
+      appearance: none;
+    }
+    input:focus, textarea:focus {
+      outline: 2px solid var(--orange);
+      outline-offset: 1px;
+      background: #fff;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    details.area { background: var(--card); }
+    details.area > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      min-height: 56px;
+      cursor: pointer;
+      font-weight: 700;
+      user-select: none;
+    }
+    details.area > summary::-webkit-details-marker { display: none; }
+    details.area > summary .chev {
+      margin-left: auto;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid #888;
+      border-bottom: 2px solid #888;
+      transform: rotate(45deg);
+      transition: transform .15s ease;
+    }
+    details.area[open] > summary .chev { transform: rotate(225deg); }
+    .badge {
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--fill);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 4px 8px;
+      min-width: 2.5em;
+      text-align: center;
+    }
+    .badge.done { background: #e6f4ec; color: var(--ok); }
+    .area-body { padding: 0 16px 16px; border-top: 1px solid var(--line); }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .field-row.full { grid-template-columns: 1fr; }
+    .field .letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border: 1.5px solid var(--ink);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .a-pair {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .a-pair span { color: var(--muted); font-weight: 700; }
+    .hint { font-size: 12px; color: var(--muted); margin: 4px 0 0; font-weight: 400; }
+    .photos { margin-top: 12px; }
+    .photo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .photo-item {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #eee;
+    }
+    .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-item button.remove {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,.7);
+      color: #fff;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+    }
+    .file-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: var(--fill);
+      border: 1px dashed #b9b4aa;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .file-btn input { display: none; }
+    button, .btn {
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      border: 0;
+      border-radius: 12px;
+      min-height: 48px;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--orange);
+      color: #1c1c1c;
+    }
+    .btn-primary:active { background: var(--orange-dk); }
+    .btn-secondary {
+      background: #1c1c1c;
+      color: #fff;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      min-height: 44px;
+    }
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      font-weight: 600;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .add-btn {
+      width: 100%;
+      background: #fff;
+      border: 1.5px dashed #b9b4aa;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .name-edit { margin-top: 12px; }
+    .save-status {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+    footer.bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      background: #fff;
+      border-top: 1px solid var(--line);
+      padding: 10px 16px calc(10px + var(--safe-b));
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+    footer.bar button { flex: 1; }
+    .toast {
+      position: fixed;
+      left: 16px; right: 16px;
+      bottom: calc(86px + var(--safe-b));
+      background: #1c1c1c;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      text-align: center;
+      z-index: 30;
+      display: none;
+    }
+    .toast.show { display: block; }
+    /* Lightbox */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #111;
+      z-index: 50;
+      touch-action: none;
+    }
+    #lightbox.open { display: block; }
+    #lightbox .lb-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #lightbox img {
+      position: absolute;
+      top: 0; left: 0;
+      transform-origin: 0 0;
+      user-select: none;
+      -webkit-user-drag: none;
+      max-width: none;
+    }
+    #lightbox .lb-close, #lightbox .lb-hint {
+      position: absolute;
+      z-index: 2;
+      color: #fff;
+    }
+    #lightbox .lb-close {
+      top: calc(8px + var(--safe-t));
+      right: 12px;
+      width: 44px; height: 44px;
+      border-radius: 22px;
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      font-size: 22px;
+      min-height: 44px;
+      padding: 0;
+    }
+    #lightbox .lb-hint {
+      left: 0; right: 0;
+      bottom: calc(10px + var(--safe-b));
+      text-align: center;
+      font-size: 13px;
+      color: #ddd;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-head">
+    <div class="brand">I-5 Design | Build</div>
+    <h1>Gila River Lone Butte – Existing Roof Joist Field Measurements (D01 / D11 / D05)</h1>
+    <p>Project 5291 · Sheet FM-01 · For field verification only</p>
+  </header>
+
+  <main>
+    <h2>Reference sheet</h2>
+    <div class="card sheet-card">
+      <p>Tap the drawing to zoom in and see what each letter (A–H) means.</p>
+      <picture>
+        <source srcset="fm01-sheet.webp" type="image/webp">
+        <img id="sheetThumb" class="sheet-thumb" src="fm01-sheet.jpg" alt="FM-01 existing roof joist field measurement sheet with lettered callouts A through H" width="2400" height="1553">
+      </picture>
+      <button type="button" class="btn-secondary sheet-btn" id="openSheet">Open sheet — tap to zoom</button>
+    </div>
+
+    <h2>Who measured</h2>
+    <div class="card">
+      <div class="meta-grid">
+        <div>
+          <label for="measuredBy">Measured by</label>
+          <input id="measuredBy" type="text" autocomplete="name" placeholder="Your name">
+        </div>
+        <div>
+          <label for="measuredDate">Date</label>
+          <input id="measuredDate" type="date">
+        </div>
+      </div>
+    </div>
+
+    <h2>Joists</h2>
+    <div id="areas"></div>
+    <button type="button" class="add-btn" id="addArea">+ Add joist / area</button>
+    <p class="save-status" id="saveStatus">Progress is saved on this phone only.</p>
+    <button type="button" class="btn-ghost" id="clearAll" style="width:100%">Clear all saved data</button>
+  </main>
+
+  <footer class="bar">
+    <button type="button" class="btn-secondary" id="sharePdf">Share PDF</button>
+    <button type="button" class="btn-primary" id="makePdf">Make PDF</button>
+  </footer>
+  <div class="toast" id="toast" role="status"></div>
+
+  <div id="lightbox" aria-hidden="true">
+    <button type="button" class="lb-close" id="lbClose" aria-label="Close">×</button>
+    <div class="lb-stage" id="lbStage">
+      <img id="lbImg" alt="FM-01 measurement sheet, zoomed">
+    </div>
+    <div class="lb-hint">Pinch to zoom · drag to pan · tap × to close</div>
+  </div>
+
+  <script src="jspdf.umd.min.js"></script>
+  <script>
+  (function () {
+    const STORAGE_KEY = "gr-joist-fm01-v1";
+    const PHOTO_MAX = 6;
+    const PHOTO_EDGE = 1400;
+    const PHOTO_QUALITY = 0.68;
+
+    const DEFAULT_AREAS = [
+      { id: "d01", name: "D01 area" },
+      { id: "d11", name: "D11 area" },
+      { id: "d05-1", name: "D05 area 1" },
+      { id: "d05-2", name: "D05 area 2" },
+      { id: "d05-3", name: "D05 area 3" },
+      { id: "d05-4", name: "D05 area 4" }
+    ];
+
+    const emptyArea = (partial) => Object.assign({
+      id: "",
+      name: "",
+      custom: false,
+      grid: "",
+      a1: "", a2: "",
+      b: "", c: "", d: "", e: "", f: "", g: "", h: "",
+      notes: "",
+      photos: []
+    }, partial);
+
+    const state = {
+      measuredBy: "",
+      date: todayISO(),
+      areas: DEFAULT_AREAS.map((a) => emptyArea({ ...a, custom: false }))
+    };
+
+    function todayISO() {
+      const d = new Date();
+      const tz = d.getTimezoneOffset() * 60000;
+      return new Date(d.getTime() - tz).toISOString().slice(0, 10);
+    }
+
+    function uid() {
+      return "x-" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2800);
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.measuredBy != null) state.measuredBy = data.measuredBy;
+        if (data.date) state.date = data.date;
+        if (Array.isArray(data.areas) && data.areas.length) {
+          state.areas = data.areas.map((a) => emptyArea(a));
+        }
+      } catch (err) {
+        console.warn("Could not load saved data", err);
+      }
+    }
+
+    function save(okMsg) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const el = document.getElementById("saveStatus");
+        const t = new Date();
+        el.textContent = "Saved on this phone · " + t.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        if (okMsg) toast(okMsg);
+        return true;
+      } catch (err) {
+        // Likely quota from photos — retry without photos in storage, keep them in memory
+        try {
+          const slim = {
+            measuredBy: state.measuredBy,
+            date: state.date,
+            areas: state.areas.map((a) => Object.assign({}, a, { photos: [] })),
+            photosDropped: true
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+          document.getElementById("saveStatus").textContent =
+            "Text saved. Photos may not fit in phone storage — make the PDF before closing.";
+          toast("Text saved. Photos may not persist if you close this page.");
+        } catch (err2) {
+          toast("Could not save. Make the PDF before closing this page.");
+        }
+        return false;
+      }
+    }
+
+    function filledCount(area) {
+      const keys = ["grid", "a1", "a2", "b", "c", "d", "e", "f", "g", "h"];
+      return keys.filter((k) => String(area[k] || "").trim()).length;
+    }
+
+    function formatA(area) {
+      const a1 = (area.a1 || "").trim();
+      const a2 = (area.a2 || "").trim();
+      if (!a1 && !a2) return "";
+      return "L " + (a1 || "—") + " x " + (a2 || "—");
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function render() {
+      document.getElementById("measuredBy").value = state.measuredBy;
+      document.getElementById("measuredDate").value = state.date;
+      const root = document.getElementById("areas");
+      root.innerHTML = "";
+      state.areas.forEach((area, idx) => {
+        const filled = filledCount(area);
+        const el = document.createElement("details");
+        el.className = "area card";
+        el.dataset.id = area.id;
+        if (idx === 0 && filled === 0 && state.areas.length === DEFAULT_AREAS.length) el.open = true;
+        el.innerHTML = areaCardHtml(area, filled);
+        bindArea(el, area);
+        root.appendChild(el);
+      });
+    }
+
+    function areaCardHtml(area, filled) {
+      const customName = area.custom
+        ? `<div class="name-edit"><label>Area name</label><input type="text" data-k="name" value="${escapeHtml(area.name)}"></div>`
+        : "";
+      const remove = area.custom
+        ? `<button type="button" class="btn-danger" data-remove>Remove this joist</button>`
+        : "";
+      const photos = (area.photos || []).map((p, i) => `
+        <div class="photo-item">
+          <img src="${p.dataUrl}" alt="Photo ${i + 1} for ${escapeHtml(area.name)}">
+          <button type="button" class="remove" data-photo-i="${i}" aria-label="Remove photo">×</button>
+        </div>`).join("");
+      return `
+        <summary>
+          <span>${escapeHtml(area.name || "Joist")}</span>
+          <span class="badge ${filled ? "done" : ""}">${filled}/10</span>
+          <span class="chev"></span>
+        </summary>
+        <div class="area-body">
+          ${customName}
+          <div class="field-row full">
+            <div class="field">
+              <label>Grid location</label>
+              <input type="text" data-k="grid" value="${escapeHtml(area.grid)}" placeholder="e.g. D–E / 8–9" autocomplete="off">
+            </div>
+          </div>
+          <div class="field-row full">
+            <div class="field">
+              <label><span class="letter">A</span> Bottom chord angle size (leg × leg)</label>
+              <div class="a-pair">
+                <span>L</span>
+                <input type="text" inputmode="decimal" data-k="a1" value="${escapeHtml(area.a1)}" placeholder="leg" autocomplete="off">
+                <span>×</span>
+                <input type="text" inputmode="decimal" data-k="a2" value="${escapeHtml(area.a2)}" placeholder="leg" autocomplete="off">
+              </div>
+              <p class="hint">Inches, decimal or fraction (e.g. 3 or 3/16)</p>
+            </div>
+          </div>
+          <div class="field-row">
+            ${numField("b", "B", "Angle thickness", area.b)}
+            ${numField("c", "C", "Gap between angles", area.c)}
+          </div>
+          <div class="field-row">
+            ${numField("d", "D", "Diagonal member size", area.d)}
+            ${numField("e", "E", "Vertical member size", area.e)}
+          </div>
+          <div class="field-row">
+            ${numField("f", "F", "Weld length, diagonal", area.f)}
+            ${numField("g", "G", "Weld length, vertical", area.g)}
+          </div>
+          <div class="field-row full">
+            ${numField("h", "H", "Panel point spacing", area.h)}
+          </div>
+          <div class="field-row full">
+            <div class="field">
+              <label>Notes</label>
+              <textarea data-k="notes" placeholder="Anything unusual, a size change along the span, etc.">${escapeHtml(area.notes)}</textarea>
+            </div>
+          </div>
+          <div class="photos">
+            <label>Photos</label>
+            <div class="field-row">
+              <label class="file-btn">Take photo
+                <input type="file" accept="image/*" capture="environment" data-photo>
+              </label>
+              <label class="file-btn">From library
+                <input type="file" accept="image/*" data-photo>
+              </label>
+            </div>
+            <p class="hint">Tape in the shot helps. Up to ${PHOTO_MAX} photos per joist.</p>
+            <div class="photo-row">${photos}</div>
+          </div>
+          ${remove}
+        </div>`;
+    }
+
+    function numField(key, letter, label, value) {
+      return `<div class="field">
+        <label><span class="letter">${letter}</span> ${escapeHtml(label)}</label>
+        <input type="text" inputmode="decimal" data-k="${key}" value="${escapeHtml(value)}" placeholder="in." autocomplete="off">
+      </div>`;
+    }
+
+    function bindArea(el, area) {
+      el.querySelectorAll("[data-k]").forEach((input) => {
+        input.addEventListener("input", () => {
+          area[input.dataset.k] = input.value;
+          const badge = el.querySelector(".badge");
+          const n = filledCount(area);
+          badge.textContent = n + "/10";
+          badge.classList.toggle("done", n > 0);
+          if (input.dataset.k === "name") {
+            const title = el.querySelector("summary span");
+            if (title) title.textContent = area.name || "Joist";
+          }
+          scheduleSave();
+        });
+      });
+      const onPhoto = async (ev) => {
+        const f = ev.target.files && ev.target.files[0];
+        ev.target.value = "";
+        if (!f) return;
+        if ((area.photos || []).length >= PHOTO_MAX) {
+          toast("This joist already has " + PHOTO_MAX + " photos.");
+          return;
+        }
+        try {
+          const photo = await compressImage(f);
+          area.photos = area.photos || [];
+          area.photos.push(photo);
+          renderKeepOpen(area.id);
+          save();
+        } catch (err) {
+          console.error(err);
+          toast("Could not add that photo.");
+        }
+      };
+      el.querySelectorAll("[data-photo]").forEach((file) => file.addEventListener("change", onPhoto));
+      el.querySelectorAll("[data-photo-i]").forEach((btn) => {
+        btn.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          const i = Number(btn.dataset.photoI);
+          area.photos.splice(i, 1);
+          renderKeepOpen(area.id);
+          save();
+        });
+      });
+      const rm = el.querySelector("[data-remove]");
+      if (rm) {
+        rm.addEventListener("click", () => {
+          if (!confirm("Remove “" + (area.name || "this joist") + "” and its measurements?")) return;
+          state.areas = state.areas.filter((a) => a.id !== area.id);
+          render();
+          save();
+        });
+      }
+    }
+
+    function renderKeepOpen(id) {
+      const openIds = new Set(
+        Array.from(document.querySelectorAll("details.area[open]")).map((d) => d.dataset.id)
+      );
+      if (id) openIds.add(id);
+      render();
+      document.querySelectorAll("details.area").forEach((d) => {
+        if (openIds.has(d.dataset.id)) d.open = true;
+      });
+    }
+
+    let saveTimer;
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(save, 250);
+    }
+
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let w = img.naturalWidth, h = img.naturalHeight;
+          const scale = Math.min(1, PHOTO_EDGE / Math.max(w, h));
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL("image/jpeg", PHOTO_QUALITY);
+          resolve({ name: file.name || "photo.jpg", dataUrl, w, h });
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("image"));
+        };
+        img.src = url;
+      });
+    }
+
+    /* ---------- PDF ---------- */
+    function buildPdf() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error("PDF library did not load. Check your connection and try again.");
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "in", format: "letter" });
+      const W = 11, H = 8.5;
+      const m = 0.5;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(232, 148, 26);
+      doc.text("I-5 DESIGN  |  BUILD", m, 0.38);
+      doc.setTextColor(20, 20, 20);
+      doc.setFontSize(14);
+      doc.text("Gila River Lone Butte — Existing Roof Joist Field Measurements", m, 0.62);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("D01 / D11 / D05    ·    Project 5291    ·    Sheet FM-01    ·    For field verification only", m, 0.80);
+
+      const by = state.measuredBy || "—";
+      const dt = state.date || "—";
+      doc.setFontSize(10);
+      doc.text("Measured by: " + by + "      Date: " + dt, m, 1.02);
+      doc.setTextColor(90, 90, 90);
+      doc.text("Generated: " + new Date().toLocaleString(), W - m, 1.02, { align: "right" });
+      doc.setTextColor(20, 20, 20);
+
+      const cols = [
+        { k: "name", h: "Area", w: 1.30 },
+        { k: "grid", h: "Grid location", w: 1.45 },
+        { k: "A", h: "A  angle", w: 1.15 },
+        { k: "b", h: "B  thk", w: 0.70 },
+        { k: "c", h: "C  gap", w: 0.70 },
+        { k: "d", h: "D  diag.", w: 0.85 },
+        { k: "e", h: "E  vert.", w: 0.85 },
+        { k: "f", h: "F  weld d.", w: 0.78 },
+        { k: "g", h: "G  weld v.", w: 0.78 },
+        { k: "h", h: "H  spacing", w: 0.80 },
+        { k: "photos", h: "Photos", w: 0.64 }
+      ];
+      const tableW = cols.reduce((s, c) => s + c.w, 0);
+      let x0 = m;
+      let y = 1.20;
+      const rowH = 0.32;
+      const hdrH = 0.36;
+
+      doc.setFillColor(230, 230, 230);
+      doc.rect(x0, y, tableW, hdrH, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      let x = x0;
+      cols.forEach((c) => {
+        doc.text(c.h, x + 0.06, y + 0.22);
+        x += c.w;
+      });
+      y += hdrH;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+
+      function cellVal(area, col) {
+        if (col.k === "A") return formatA(area);
+        if (col.k === "photos") return String((area.photos || []).length || "");
+        if (col.k === "name") return area.name || "";
+        return (area[col.k] || "").trim();
+      }
+
+      state.areas.forEach((area, i) => {
+        if (y + rowH > H - 0.55) {
+          doc.addPage();
+          y = m;
+        }
+        if (i % 2 === 1) {
+          doc.setFillColor(247, 245, 241);
+          doc.rect(x0, y, tableW, rowH, "F");
+        }
+        x = x0;
+        cols.forEach((c) => {
+          const t = cellVal(area, c);
+          doc.text(String(t).slice(0, 28), x + 0.05, y + 0.21, { maxWidth: c.w - 0.08 });
+          x += c.w;
+        });
+        y += rowH;
+      });
+
+      // table border and grid
+      // (drawn after fill so it stays on top of last page only — redraw simple outline)
+      doc.setDrawColor(40, 40, 40);
+      doc.setLineWidth(0.01);
+      // outline of last table segment is approximate; acceptable
+
+      y += 0.18;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("Notes", m, y);
+      y += 0.18;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      const notes = state.areas.filter((a) => (a.notes || "").trim());
+      if (!notes.length) {
+        doc.setTextColor(90, 90, 90);
+        doc.text("No notes entered.", m, y);
+        doc.setTextColor(20, 20, 20);
+        y += 0.24;
+      } else {
+        notes.forEach((a) => {
+          const block = a.name + ": " + a.notes.trim();
+          const lines = doc.splitTextToSize(block, W - 2 * m);
+          if (y + lines.length * 0.18 > H - 0.45) {
+            doc.addPage();
+            y = m;
+          }
+          doc.setFont("helvetica", "bold");
+          doc.text(a.name + ": ", m, y);
+          doc.setFont("helvetica", "normal");
+          const prefixW = doc.getTextWidth(a.name + ": ");
+          const rest = doc.splitTextToSize(a.notes.trim(), W - 2 * m - prefixW);
+          doc.text(rest[0] || "", m + prefixW, y);
+          y += 0.18;
+          rest.slice(1).forEach((ln) => {
+            if (y > H - 0.45) { doc.addPage(); y = m; }
+            doc.text(ln, m, y);
+            y += 0.18;
+          });
+          y += 0.06;
+        });
+      }
+
+      // Photos
+      const withPhotos = state.areas.filter((a) => (a.photos || []).length);
+      if (withPhotos.length) {
+        doc.addPage();
+        y = m;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("Photos", m, y);
+        y += 0.2;
+        withPhotos.forEach((a) => {
+          a.photos.forEach((p, i) => {
+            const maxW = 4.8, maxH = 3.2;
+            const iw = p.w || 1600, ih = p.h || 1200;
+            const sc = Math.min(maxW / iw, maxH / ih);
+            const pw = Math.max(0.5, iw * sc);
+            const ph = Math.max(0.5, ih * sc);
+            if (y + ph + 0.4 > H - m) {
+              doc.addPage();
+              y = m;
+            }
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text(a.name + "  ·  photo " + (i + 1), m, y);
+            y += 0.12;
+            try {
+              doc.addImage(p.dataUrl, "JPEG", m, y, pw, ph);
+            } catch (err) {
+              doc.setFont("helvetica", "normal");
+              doc.text("(Could not embed this photo)", m, y + 0.2);
+            }
+            y += ph + 0.22;
+          });
+        });
+      }
+
+      // footer on each page
+      const pages = doc.getNumberOfPages();
+      for (let i = 1; i <= pages; i++) {
+        doc.setPage(i);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(90, 90, 90);
+        doc.text("Gila River Lone Butte  ·  5291  ·  Existing roof joist field measurements  ·  For field verification only", m, H - 0.28);
+        doc.text("Page " + i + " of " + pages, W - m, H - 0.28, { align: "right" });
+        doc.setTextColor(20, 20, 20);
+      }
+      return doc;
+    }
+
+    function pdfFilename() {
+      const d = (state.date || todayISO()).replace(/-/g, "");
+      return "GR_5291_Joist_Field_Measurements_" + d + ".pdf";
+    }
+
+    async function makePdf(share) {
+      try {
+        const doc = buildPdf();
+        const blob = doc.output("blob");
+        const name = pdfFilename();
+        const file = new File([blob], name, { type: "application/pdf" });
+        if (share && navigator.share) {
+          const can = !navigator.canShare || navigator.canShare({ files: [file] });
+          if (can) {
+            try {
+              await navigator.share({
+                title: "Gila River joist field measurements",
+                text: "FM-01 field measurements, Gila River Lone Butte (5291).",
+                files: [file]
+              });
+              toast("PDF shared.");
+              return;
+            } catch (err) {
+              if (err && err.name === "AbortError") return;
+              // fall through to download
+            }
+          }
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        toast("PDF downloaded.");
+      } catch (err) {
+        console.error(err);
+        toast(err.message || "Could not make the PDF.");
+      }
+    }
+
+    /* ---------- Lightbox zoom ---------- */
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const sheetSrc = "fm01-sheet.jpg";
+    const zoom = { s: 1, x: 0, y: 0, min: 1, max: 6 };
+
+    function applyZoom() {
+      lbImg.style.transform = "translate(" + zoom.x + "px," + zoom.y + "px) scale(" + zoom.s + ")";
+    }
+
+    function fitSheet() {
+      const img = lbImg;
+      const sw = img.naturalWidth || 2400;
+      const sh = img.naturalHeight || 1553;
+      const vw = lb.clientWidth;
+      const vh = lb.clientHeight;
+      const fit = Math.min(vw / sw, vh / sh);
+      zoom.min = fit;
+      zoom.s = fit * 1.0;
+      zoom.x = (vw - sw * zoom.s) / 2;
+      zoom.y = (vh - sh * zoom.s) / 2;
+      applyZoom();
+    }
+
+    function openSheet() {
+      if (!lbImg.src) lbImg.src = sheetSrc;
+      lb.classList.add("open");
+      lb.setAttribute("aria-hidden", "false");
+      if (lbImg.complete) fitSheet();
+      else lbImg.onload = fitSheet;
+    }
+    function closeSheet() {
+      lb.classList.remove("open");
+      lb.setAttribute("aria-hidden", "true");
+    }
+
+    (function panPinch() {
+      const pointers = new Map();
+      let lastDist = 0, lastMid = null, lastTap = 0;
+      lb.addEventListener("pointerdown", (e) => {
+        if (e.target.closest(".lb-close")) return;
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        lb.setPointerCapture(e.pointerId);
+        lastDist = 0;
+        lastMid = null;
+        const now = Date.now();
+        if (now - lastTap < 280 && pointers.size === 1) {
+          // double-tap toggle
+          if (zoom.s < zoom.min * 1.8) {
+            zoom.s = Math.min(zoom.max, zoom.min * 2.5);
+            zoom.x = e.clientX - (e.clientX - zoom.x) * (zoom.s / (zoom.min));
+            zoom.y = e.clientY - (e.clientY - zoom.y) * (zoom.s / (zoom.min));
+            // simpler: center on tap
+            fitSheet();
+            zoom.s = Math.min(zoom.max, zoom.min * 2.4);
+            zoom.x = e.clientX - (e.clientX - 0) * 0; // reset then center
+            const sw = lbImg.naturalWidth, sh = lbImg.naturalHeight;
+            zoom.x = e.clientX - (e.clientX / lb.clientWidth) * sw * zoom.s;
+            zoom.y = e.clientY - (e.clientY / lb.clientHeight) * sh * zoom.s;
+            applyZoom();
+          } else {
+            fitSheet();
+          }
+          lastTap = 0;
+        } else {
+          lastTap = now;
+        }
+      });
+      lb.addEventListener("pointermove", (e) => {
+        if (!pointers.has(e.pointerId)) return;
+        const prev = pointers.get(e.pointerId);
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const pts = Array.from(pointers.values());
+        if (pts.length === 1) {
+          zoom.x += pts[0].x - prev.x;
+          zoom.y += pts[0].y - prev.y;
+          applyZoom();
+        } else if (pts.length >= 2) {
+          const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+          const dist = Math.hypot(dx, dy);
+          const mid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+          if (lastDist) {
+            const factor = dist / lastDist;
+            const next = Math.min(zoom.max, Math.max(zoom.min * 0.8, zoom.s * factor));
+            const ratio = next / zoom.s;
+            zoom.x = mid.x - (mid.x - zoom.x) * ratio;
+            zoom.y = mid.y - (mid.y - zoom.y) * ratio;
+            zoom.s = next;
+            applyZoom();
+          }
+          lastDist = dist;
+          lastMid = mid;
+        }
+      });
+      function endPtr(e) {
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) lastDist = 0;
+      }
+      lb.addEventListener("pointerup", endPtr);
+      lb.addEventListener("pointercancel", endPtr);
+      lb.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.12 : 0.9;
+        const next = Math.min(zoom.max, Math.max(zoom.min * 0.8, zoom.s * factor));
+        const ratio = next / zoom.s;
+        zoom.x = e.clientX - (e.clientX - zoom.x) * ratio;
+        zoom.y = e.clientY - (e.clientY - zoom.y) * ratio;
+        zoom.s = next;
+        applyZoom();
+      }, { passive: false });
+    })();
+
+    /* ---------- events ---------- */
+    document.getElementById("measuredBy").addEventListener("input", (e) => {
+      state.measuredBy = e.target.value;
+      scheduleSave();
+    });
+    document.getElementById("measuredDate").addEventListener("input", (e) => {
+      state.date = e.target.value;
+      scheduleSave();
+    });
+    document.getElementById("addArea").addEventListener("click", () => {
+      const n = state.areas.filter((a) => a.custom).length + 1;
+      const area = emptyArea({
+        id: uid(),
+        name: "Extra joist " + n,
+        custom: true
+      });
+      state.areas.push(area);
+      renderKeepOpen(area.id);
+      save();
+      const card = document.querySelector('details.area[data-id="' + area.id + '"]');
+      const nameInput = card && card.querySelector('[data-k="name"]');
+      if (nameInput) nameInput.focus();
+    });
+    document.getElementById("clearAll").addEventListener("click", () => {
+      if (!confirm("Clear all measurements and photos saved on this phone?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state.measuredBy = "";
+      state.date = todayISO();
+      state.areas = DEFAULT_AREAS.map((a) => emptyArea({ ...a, custom: false }));
+      render();
+      document.getElementById("saveStatus").textContent = "Saved data cleared.";
+      toast("Cleared.");
+    });
+    document.getElementById("makePdf").addEventListener("click", () => makePdf(false));
+    document.getElementById("sharePdf").addEventListener("click", () => makePdf(true));
+    document.getElementById("openSheet").addEventListener("click", openSheet);
+    document.getElementById("sheetThumb").addEventListener("click", openSheet);
+    document.getElementById("lbClose").addEventListener("click", closeSheet);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeSheet();
+    });
+
+    load();
+    render();
+  })();
+  </script>
+</body>
+</html>
