@@ -361,10 +361,7 @@
     <h2>Reference sheet</h2>
     <div class="card sheet-card">
       <p>Tap the drawing to zoom in and see what each letter (A–H) means.</p>
-      <picture>
-        <source srcset="fm01-sheet.webp" type="image/webp">
-        <img id="sheetThumb" class="sheet-thumb" src="fm01-sheet.jpg" alt="FM-01 existing roof joist field measurement sheet with lettered callouts A through H" width="2400" height="1553">
-      </picture>
+      <img id="sheetThumb" class="sheet-thumb" alt="FM-01 existing roof joist field measurement sheet with lettered callouts A through H" width="2400" height="1553">
       <button type="button" class="btn-secondary sheet-btn" id="openSheet">Open sheet — tap to zoom</button>
     </div>
 
@@ -403,6 +400,10 @@
     <div class="lb-hint">Pinch to zoom · drag to pan · tap × to close</div>
   </div>
 
+  <script src="fm01-sheet.js"></script>
+  <script>
+    document.getElementById("sheetThumb").src = window.FM01_SHEET_JPG;
+  </script>
   <script src="jspdf.umd.min.js"></script>
   <script>
   (function () {
@@ -940,7 +941,7 @@
     /* ---------- Lightbox zoom ---------- */
     const lb = document.getElementById("lightbox");
     const lbImg = document.getElementById("lbImg");
-    const sheetSrc = "fm01-sheet.jpg";
+    const sheetSrc = window.FM01_SHEET_JPG;
     const zoom = { s: 1, x: 0, y: 0, min: 1, max: 6 };
 
     function applyZoom() {
