@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1a1a1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="GR Joist Measures">
-  <title>Gila River Lone Butte – Existing Roof Joist Field Measurements</title>
+  <title>Gila River Lone Butte – Existing Roof Joist Field Measurements (D01 / D02 / D05 / D11)</title>
   <style>
     :root {
       --ink: #1c1c1c;
@@ -343,11 +343,18 @@
 <body>
   <header class="app-head">
     <div class="brand">I-5 Design | Build</div>
-    <h1>Gila River Lone Butte – Existing Roof Joist Field Measurements (D01 / D11 / D05)</h1>
-    <p>Project 5291 · Sheet FM-01 · For field verification only</p>
+    <h1>Gila River Lone Butte – Existing Roof Joist Field Measurements (D01 / D02 / D05 / D11)</h1>
+    <p>Project 5291 · Location plan + Sheet FM-01 · For field verification only</p>
   </header>
 
   <main>
+    <h2>Where to measure</h2>
+    <div class="card sheet-card">
+      <p>Tap the plan to zoom in and see D01, D02, D11, and each D05 area.</p>
+      <img id="locThumb" class="sheet-thumb" src="locations.png" alt="Overall ceiling plan with highlighted joist measurement locations for D01, D02, D11, and D05 areas 1 through 3" width="3400" height="2200">
+      <button type="button" class="btn-secondary sheet-btn" id="openLoc">Open plan — tap to zoom</button>
+    </div>
+
     <h2>Reference sheet</h2>
     <div class="card sheet-card">
       <p>Tap the drawing to zoom in and see what each letter (A–H) means.</p>
@@ -371,7 +378,7 @@
   <div id="lightbox" aria-hidden="true">
     <button type="button" class="lb-close" id="lbClose" aria-label="Close">×</button>
     <div class="lb-stage" id="lbStage">
-      <img id="lbImg" alt="FM-01 measurement sheet, zoomed">
+      <img id="lbImg" alt="Reference drawing, zoomed">
     </div>
     <div class="lb-hint">Pinch to zoom · drag to pan · tap × to close</div>
   </div>
@@ -383,19 +390,19 @@
   <script src="jspdf.umd.min.js"></script>
   <script>
   (function () {
-    const STORAGE_KEY = "gr-joist-fm01-v2";
-    const LEGACY_STORAGE_KEYS = ["gr-joist-fm01-v1"];
+    const STORAGE_KEY = "gr-joist-fm01-v3";
+    const LEGACY_STORAGE_KEYS = ["gr-joist-fm01-v2", "gr-joist-fm01-v1"];
     const PHOTO_MAX = 6;
     const PHOTO_EDGE = 1400;
     const PHOTO_QUALITY = 0.68;
 
     const DEFAULT_AREAS = [
-      { id: "d01", name: "D01 area" },
-      { id: "d11", name: "D11 area" },
-      { id: "d05-1", name: "D05 area 1" },
-      { id: "d05-2", name: "D05 area 2" },
-      { id: "d05-3", name: "D05 area 3" },
-      { id: "d05-4", name: "D05 area 4" }
+      { id: "d01", name: "D01 – River Bar ceiling" },
+      { id: "d02", name: "D02 – LED frame inside D01" },
+      { id: "d11", name: "D11 – High Limit Table Games chandelier" },
+      { id: "d05-1", name: "D05 area 1 – West / C wing" },
+      { id: "d05-2", name: "D05 area 2 – East / B wing" },
+      { id: "d05-3", name: "D05 area 3 – South entry / Z3" }
     ];
 
     const emptyArea = (partial) => {
@@ -427,6 +434,25 @@
       toast._t = setTimeout(() => el.classList.remove("show"), 2800);
     }
 
+
+    function migrateAreas(saved) {
+      const byId = {};
+      const custom = [];
+      (saved || []).forEach((a) => {
+        const area = emptyArea(a);
+        if (area.custom) custom.push(area);
+        else byId[area.id] = area;
+      });
+      // Keep measurements for D01, D11, and D05 1–3. Drop D05 area 4.
+      // D02 is new; do not copy D11 (or any other mark) onto it.
+      const areas = DEFAULT_AREAS.map((def) => {
+        const prev = byId[def.id];
+        if (!prev) return emptyArea({ ...def, custom: false });
+        return emptyArea(Object.assign({}, prev, { id: def.id, name: def.name, custom: false }));
+      });
+      return areas.concat(custom);
+    }
+
     function load() {
       try {
         let raw = localStorage.getItem(STORAGE_KEY);
@@ -440,7 +466,7 @@
         if (raw) {
           const data = JSON.parse(raw);
           if (Array.isArray(data.areas) && data.areas.length) {
-            state.areas = data.areas.map((a) => emptyArea(a));
+            state.areas = migrateAreas(data.areas);
           }
         }
         if (fromLegacy) {
@@ -701,7 +727,7 @@
       doc.text("Gila River Lone Butte — Existing Roof Joist Field Measurements", m, 0.62);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.text("D01 / D11 / D05    ·    Project 5291    ·    Sheet FM-01    ·    For field verification only", m, 0.80);
+      doc.text("D01 / D02 / D05 / D11    ·    Project 5291    ·    Sheet FM-01    ·    For field verification only", m, 0.80);
 
       const cols = [
         { k: "name", h: "Area", w: 1.70 },
@@ -860,6 +886,7 @@
     const lb = document.getElementById("lightbox");
     const lbImg = document.getElementById("lbImg");
     const sheetSrc = window.FM01_SHEET_JPG;
+    const locSrc = "locations.png";
     const zoom = { s: 1, x: 0, y: 0, min: 1, max: 6 };
 
     function applyZoom() {
@@ -880,13 +907,19 @@
       applyZoom();
     }
 
-    function openSheet() {
-      if (!lbImg.src) lbImg.src = sheetSrc;
+    function openRef(src, alt) {
+      if (lbImg.getAttribute("data-src") !== src) {
+        lbImg.setAttribute("data-src", src);
+        lbImg.alt = alt || "Reference drawing, zoomed";
+        lbImg.src = src;
+      }
       lb.classList.add("open");
       lb.setAttribute("aria-hidden", "false");
-      if (lbImg.complete) fitSheet();
+      if (lbImg.complete && lbImg.naturalWidth) fitSheet();
       else lbImg.onload = fitSheet;
     }
+    function openSheet() { openRef(sheetSrc, "FM-01 measurement sheet, zoomed"); }
+    function openLoc() { openRef(locSrc, "Joist measurement location plan, zoomed"); }
     function closeSheet() {
       lb.classList.remove("open");
       lb.setAttribute("aria-hidden", "true");
@@ -994,6 +1027,8 @@
     });
     document.getElementById("makePdf").addEventListener("click", () => makePdf(false));
     document.getElementById("sharePdf").addEventListener("click", () => makePdf(true));
+    document.getElementById("openLoc").addEventListener("click", openLoc);
+    document.getElementById("locThumb").addEventListener("click", openLoc);
     document.getElementById("openSheet").addEventListener("click", openSheet);
     document.getElementById("sheetThumb").addEventListener("click", openSheet);
     document.getElementById("lbClose").addEventListener("click", closeSheet);
